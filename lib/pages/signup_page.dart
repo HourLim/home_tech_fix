@@ -115,7 +115,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          "HomeTech Fix",
+                          "HomeTechFix",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
