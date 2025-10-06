@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:hometechfix/pages/main_navigation/main_navigation.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -28,7 +28,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Match the exact styling approach used in LoginPage
+    // same theming as LoginPage
     final colorScheme = ColorScheme.fromSeed(seedColor: const Color(0xFF1E88E5));
     final theme = Theme.of(context).copyWith(
       colorScheme: colorScheme,
@@ -77,7 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // Same gradient header as LoginPage
+            // gradient header (same as login)
             Container(
               height: 280,
               decoration: const BoxDecoration(
@@ -95,7 +95,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     const SizedBox(height: 28),
 
-                    // Logo + App title (same structure as LoginPage)
+                    // logo + title (same structure)
                     Column(
                       children: [
                         Container(
@@ -125,7 +125,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          // Keep concise subtitle like LoginPage
                           "Create your account",
                           style: TextStyle(
                             color: Colors.white.withOpacity(.9),
@@ -137,7 +136,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                     const SizedBox(height: 24),
 
-                    // Floating card form (same layout + spacing as LoginPage)
+                    // floating form card (matches login)
                     Container(
                       width: double.infinity,
                       margin: const EdgeInsets.only(top: 8),
@@ -160,14 +159,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           children: [
                             const Text(
                               "Create account",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                              ),
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                             ),
                             const SizedBox(height: 20),
 
-                            // Username (matches login input styling)
                             TextFormField(
                               controller: _usernameController,
                               textInputAction: TextInputAction.next,
@@ -185,7 +180,6 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 14),
 
-                            // Password
                             TextFormField(
                               controller: _passwordController,
                               textInputAction: TextInputAction.next,
@@ -196,27 +190,18 @@ class _SignUpPageState extends State<SignUpPage> {
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
                                   tooltip: _obscurePassword ? "Show password" : "Hide password",
-                                  icon: Icon(
-                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  ),
-                                  onPressed: () {
-                                    setState(() => _obscurePassword = !_obscurePassword);
-                                  },
+                                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                                 ),
                               ),
                               validator: (val) {
-                                if (val == null || val.isEmpty) {
-                                  return "Please enter your password";
-                                }
-                                if (val.length < 6) {
-                                  return "Password must be at least 6 characters";
-                                }
+                                if (val == null || val.isEmpty) return "Please enter your password";
+                                if (val.length < 6) return "Password must be at least 6 characters";
                                 return null;
                               },
                             ),
                             const SizedBox(height: 14),
 
-                            // Confirm Password
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
@@ -225,33 +210,19 @@ class _SignUpPageState extends State<SignUpPage> {
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
                                   tooltip: _obscureConfirmPassword ? "Show password" : "Hide password",
-                                  icon: Icon(
-                                    _obscureConfirmPassword
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
-                                  onPressed: () {
-                                    setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-                                  },
+                                  icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                                  onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                                 ),
                               ),
                               validator: (val) {
-                                if (val == null || val.isEmpty) {
-                                  return "Please confirm your password";
-                                }
-                                if (val != _passwordController.text) {
-                                  return "Passwords do not match";
-                                }
+                                if (val == null || val.isEmpty) return "Please confirm your password";
+                                if (val != _passwordController.text) return "Passwords do not match";
                                 return null;
                               },
                             ),
 
                             const SizedBox(height: 8),
 
-                            // (Optional) Forgot password style link hidden on SignUp to mirror login spacing
-                            const SizedBox(height: 2),
-
-                            // Sign Up button (same as Login button style & loading state)
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
@@ -261,18 +232,24 @@ class _SignUpPageState extends State<SignUpPage> {
                                         if (_formKey.currentState?.validate() != true) return;
                                         setState(() => _isLoading = true);
 
-                                        // TODO: Implement sign-up logic
-                                        await Future.delayed(const Duration(milliseconds: 900));
+                                        // simulate API call
+                                        await Future.delayed(const Duration(seconds: 1));
 
                                         setState(() => _isLoading = false);
-                                        // Example: Navigate to home on success
-                                        // Navigator.pushReplacementNamed(context, '/home');
+
+                                        // navigate to Home (replace current stack)
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => const MainNavigationPage(),
+                                          ),
+                                        );
                                       },
                                 child: _isLoading
                                     ? const SizedBox(
                                         height: 20,
                                         width: 20,
-                                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                                       )
                                     : const Text("Sign Up"),
                               ),
@@ -280,14 +257,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
                             const SizedBox(height: 14),
 
-                            // Link to Login (mirrors Login's Sign Up row)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  "I already have an account, ",
-                                  style: TextStyle(color: Colors.grey.shade700),
-                                ),
+                                Text("I already have an account, ",
+                                    style: TextStyle(color: Colors.grey.shade700)),
                                 GestureDetector(
                                   onTap: () => Navigator.pushNamed(context, '/login'),
                                   child: Text(
@@ -306,8 +280,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
 
                     const SizedBox(height: 28),
-
-                    // Small footnote (same placement & tone as Login)
                     Text(
                       "By creating an account, you can book and track repairs easily.",
                       style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
