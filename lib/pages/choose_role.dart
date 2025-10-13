@@ -1,5 +1,8 @@
+import 'package:hometechfix/pages/login_page.dart';
+import 'package:hometechfix/pages/technician/technician_home_page.dart';
+import 'package:hometechfix/pages/technician/technician_home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:hometechfix/pages/signup_page.dart'; // ⬅️ your SignUpPage
+import 'package:hometechfix/pages/signup_page.dart';
 
 class RoleSelectScreen extends StatefulWidget {
   const RoleSelectScreen({super.key});
@@ -31,7 +34,7 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
             children: [
               const SizedBox(height: 50),
 
-              // Centered logo + welcome
+              //  logo ng welcome
               Column(
                 children: [
                   Image.asset('assets/logo.png', height: 90),
@@ -104,18 +107,19 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
                   child: FilledButton(
                     onPressed: _selected == null
                         ? null
-                        : () {
+                        : () async {
                             if (_selected == AppRole.user) {
-                              // 👉 Go to your existing SignUpPage
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (_) => const SignUpPage()),
                               );
                             } else {
-                              // TODO: navigate technician flow (e.g., TechnicianProfilePage or TechnicianSignUp)
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Technician flow coming next")),
+                              // Technician: go to signup, pass isTechnician flag
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const SignUpPage(isTechnician: true)),
                               );
+                              // Navigation after signup/login handled in SignUpPage/LoginPage
                             }
                           },
                     style: FilledButton.styleFrom(

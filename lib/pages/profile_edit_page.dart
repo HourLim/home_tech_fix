@@ -91,11 +91,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              // Return selected image path to ProfilePage (null if unchanged)
+              // save and return 
               final String? imagePath = _selectedImage?.path;
               Navigator.pop(context, imagePath);
 
-              // Optional snack just for frontend feedback (won't be seen after pop)
+              // show confirmation 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Profile Saved")),
               );
@@ -116,7 +116,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
             children: [
-              // Profile Image (tap to change)
+              // Profile Image and tap to change
               Center(
                 child: Stack(
                   children: [

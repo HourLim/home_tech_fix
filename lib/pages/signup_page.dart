@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hometechfix/pages/main_navigation/main_navigation.dart';
+import 'package:hometechfix/pages/login_page.dart';
+import 'package:hometechfix/pages/technician/technician_home_page.dart';
+
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  final bool isTechnician;
+  const SignUpPage({super.key, this.isTechnician = false});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -28,7 +32,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    // same theming as LoginPage
+    // theme 
     final colorScheme = ColorScheme.fromSeed(seedColor: const Color(0xFF1E88E5));
     final theme = Theme.of(context).copyWith(
       colorScheme: colorScheme,
@@ -77,7 +81,7 @@ class _SignUpPageState extends State<SignUpPage> {
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // gradient header (same as login)
+            // gradient header
             Container(
               height: 280,
               decoration: const BoxDecoration(
@@ -95,7 +99,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     const SizedBox(height: 28),
 
-                    // logo + title (same structure)
+                    // logo title subtitle 
                     Column(
                       children: [
                         Container(
@@ -136,7 +140,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
                     const SizedBox(height: 24),
 
-                    // floating form card (matches login)
                     Container(
                       width: double.infinity,
                       margin: const EdgeInsets.only(top: 8),
@@ -232,18 +235,26 @@ class _SignUpPageState extends State<SignUpPage> {
                                         if (_formKey.currentState?.validate() != true) return;
                                         setState(() => _isLoading = true);
 
-                                        // simulate API call
                                         await Future.delayed(const Duration(seconds: 1));
 
                                         setState(() => _isLoading = false);
 
-                                        // navigate to Home (replace current stack)
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => const MainNavigationPage(),
-                                          ),
-                                        );
+                                        // navigate to Home
+                                        if (widget.isTechnician) {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => TechnicianHomePage(),
+                                            ),
+                                          );
+                                        } else {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => const MainNavigationPage(),
+                                            ),
+                                          );
+                                        }
                                       },
                                 child: _isLoading
                                     ? const SizedBox(
@@ -263,7 +274,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 Text("I already have an account, ",
                                     style: TextStyle(color: Colors.grey.shade700)),
                                 GestureDetector(
-                                  onTap: () => Navigator.pushNamed(context, '/login'),
+                                  onTap: () => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => LoginPage(isTechnician: widget.isTechnician),
+                                    ),
+                                  ),
                                   child: Text(
                                     "Log In",
                                     style: TextStyle(

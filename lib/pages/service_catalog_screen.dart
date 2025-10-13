@@ -45,7 +45,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ---- Header with back + dynamic title ----
+            // header bar 
             Container(
               height: 72,
               width: double.infinity,
@@ -69,7 +69,7 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> {
               ),
             ),
 
-            // ---- Grid of shops (reused widget) ----
+            // shop grid 
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -86,7 +86,6 @@ class _ServiceCatalogScreenState extends State<ServiceCatalogScreen> {
                   return ShopCard(
                     shop: shop,
                     onTap: () {
-                      // ⬇️ Navigate to the detail page with this card's data
                       Navigator.push(
                         context,
                         MaterialPageRoute(

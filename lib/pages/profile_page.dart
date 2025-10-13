@@ -12,7 +12,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   File? _profileImage;
 
-  // display-only data
+  // display data
   final _username = TextEditingController(text: "Lay Hengg");
   final _email = TextEditingController(text: "layhengg@gmail.com");
   final _phone = TextEditingController(text: "+855882327872");
@@ -57,7 +57,6 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar + pencil -> open EditProfileScreen and await result
               Center(
                 child: Stack(
                   children: [
@@ -73,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       bottom: 2,
                       child: InkWell(
                         onTap: () async {
-                          // Push editor and wait for a returned image path (String)
+
                           final String? newImagePath = await Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const EditProfileScreen()),

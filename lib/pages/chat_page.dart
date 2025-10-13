@@ -21,7 +21,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     },
     {
       "name": "Jonh Doe",
-      "message": "Hello, where are you ?",
+      "message": "Hello, i want you to clean my AC",
       "time": "2:15 PM",
       "avatar": "assets/layy.jpg",
     },

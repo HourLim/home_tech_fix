@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hometechfix/pages/main_navigation/main_navigation.dart';
+import 'package:hometechfix/pages/technician/technician_home_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final bool isTechnician;
+  const LoginPage({super.key, this.isTechnician = false});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -218,16 +220,21 @@ class _LoginPageState extends State<LoginPage> {
                                           if (_formKey.currentState?.validate() != true) return;
                                           setState(() => _isLoading = true);
 
-                                          // Simulate loading
                                           await Future.delayed(const Duration(milliseconds: 900));
 
                                           setState(() => _isLoading = false);
 
-                                          // ✅ Navigate to home page after successful login
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(builder: (_) => const MainNavigationPage()),
-                                          );
+                                          if (widget.isTechnician) {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (_) => const TechnicianHomePage()),
+                                            );
+                                          } else {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (_) => const MainNavigationPage()),
+                                            );
+                                          }
                                         },
                                   child: _isLoading
                                       ? const SizedBox(

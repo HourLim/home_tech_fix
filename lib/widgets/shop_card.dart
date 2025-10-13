@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ShopItem {
   final String name;
-  final double rating;      // ⭐ rating instead of price
+  final double rating;
   final String imageAsset;
   const ShopItem({
     required this.name,
@@ -56,7 +56,7 @@ class _ShopCardState extends State<ShopCard> {
               ),
             ),
 
-            // ⭐ Rating chip (top-right)
+            // Rating chip (top-right)
             Positioned(
               right: 10,
               top: 10,
