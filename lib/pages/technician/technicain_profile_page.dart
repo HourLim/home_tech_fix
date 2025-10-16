@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'technician_home_page.dart';
 import 'technician_chat_page.dart';
+import 'technician_job_page.dart';
 
 Future<String?> _choosePhotoSourceAndPick(BuildContext context) async {
   final source = await showModalBottomSheet<ImageSource>(
@@ -150,178 +151,186 @@ class _TechnicianProfilePageState extends State<TechnicianProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Technician Profile'),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-      ),
-      body: ValueListenableBuilder<TechnicianProfile>(
-        valueListenable: TechnicianProfileStore.I.profile,
-        builder: (_, p, __) {
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Card(
-                elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          CircleAvatar(
-                            radius: 36,
-                            backgroundImage: _avatarProvider(p.avatarPath),
-                            child: p.avatarPath == null
-                                ? Text(
-                                    _initials(p.name),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          Positioned(
-                            bottom: -4,
-                            right: -4,
-                            child: Material(
-                              color: cs.primary,
-                              shape: const CircleBorder(),
-                              child: InkWell(
-                                customBorder: const CircleBorder(),
-                                onTap: () async {
-                                  final path =
-                                      await _choosePhotoSourceAndPick(context);
-                                  if (path == null) return;
-                                  TechnicianProfileStore.I
-                                      .update(p.copyWith(avatarPath: path));
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.all(6),
-                                  child: Icon(Icons.edit,
-                                      size: 16, color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+    final orangeScheme = ColorScheme.fromSeed(seedColor: const Color(0xFFF09013));
+    return Theme(
+      data: Theme.of(context).copyWith(colorScheme: orangeScheme, useMaterial3: true),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Technician Profile'),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+        ),
+        body: ValueListenableBuilder<TechnicianProfile>(
+          valueListenable: TechnicianProfileStore.I.profile,
+          builder: (_, p, __) {
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Card(
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
                           children: [
-                            Text(
-                              p.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            CircleAvatar(
+                              radius: 36,
+                              backgroundImage: _avatarProvider(p.avatarPath),
+                              child: p.avatarPath == null
+                                  ? Text(
+                                      _initials(p.name),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    )
+                                  : null,
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              p.specialty ?? 'Technician',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: cs.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 8,
-                              runSpacing: 6,
-                              children: [
-                                _StarBar(rating: p.rating),
-                                Text(p.rating.toStringAsFixed(1)),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: p.isAvailable
-                                        ? Colors.green.withOpacity(0.1)
-                                        : Colors.red.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(
-                                    p.isAvailable
-                                        ? 'Available'
-                                        : 'Not available',
-                                    style: TextStyle(
-                                      color: p.isAvailable
-                                          ? Colors.green[700]
-                                          : Colors.red[700],
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
+                            Positioned(
+                              bottom: -4,
+                              right: -4,
+                              child: Material(
+                                color: orangeScheme.primary,
+                                shape: const CircleBorder(),
+                                child: InkWell(
+                                  customBorder: const CircleBorder(),
+                                  onTap: () async {
+                                    final path =
+                                        await _choosePhotoSourceAndPick(context);
+                                    if (path == null) return;
+                                    TechnicianProfileStore.I
+                                        .update(p.copyWith(avatarPath: path));
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(6),
+                                    child: Icon(Icons.edit,
+                                        size: 16, color: Colors.white),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      OutlinedButton.icon(
-                        onPressed: () => _openEditSheet(p),
-                        icon: const Icon(Icons.edit, size: 18),
-                        label: const Text('Edit'),
-                      ),
-                    ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                p.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                p.specialty ?? 'Technician',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: orangeScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 8,
+                                runSpacing: 6,
+                                children: [
+                                  _StarBar(rating: p.rating),
+                                  Text(p.rating.toStringAsFixed(1)),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: p.isAvailable
+                                          ? Colors.green.withOpacity(0.1)
+                                          : Colors.red.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      p.isAvailable
+                                          ? 'Available'
+                                          : 'Not available',
+                                      style: TextStyle(
+                                        color: p.isAvailable
+                                            ? Colors.green[700]
+                                            : Colors.red[700],
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        OutlinedButton.icon(
+                          onPressed: () => _openEditSheet(p),
+                          icon: const Icon(Icons.edit, size: 18),
+                          label: const Text('Edit'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              _SectionCard(title: 'Contact', children: [
-                _InfoRow(label: 'Phone', value: p.phoneNumber),
-                _InfoRow(label: 'Address', value: p.address),
-              ]),
-              const SizedBox(height: 12),
-              _SectionCard(title: 'Professional', children: [
-                if (p.specialty != null && p.specialty!.isNotEmpty)
-                  _InfoRow(label: 'Specialty', value: p.specialty!),
-                if (p.yearsOfExperience != null)
+                const SizedBox(height: 16),
+                _SectionCard(title: 'Contact', children: [
+                  _InfoRow(label: 'Phone', value: p.phoneNumber),
+                  _InfoRow(label: 'Address', value: p.address),
+                ]),
+                const SizedBox(height: 12),
+                _SectionCard(title: 'Professional', children: [
+                  if (p.specialty != null && p.specialty!.isNotEmpty)
+                    _InfoRow(label: 'Specialty', value: p.specialty!),
+                  if (p.yearsOfExperience != null)
+                    _InfoRow(
+                        label: 'Experience',
+                        value: '${p.yearsOfExperience} year(s)'),
                   _InfoRow(
-                      label: 'Experience',
-                      value: '${p.yearsOfExperience} year(s)'),
-                _InfoRow(
-                    label: 'Availability',
-                    value: p.isAvailable ? 'Available' : 'Not available'),
-                if (p.bio != null && p.bio!.isNotEmpty)
-                  _MultilineValue(label: 'About', value: p.bio!),
-              ]),
-              const SizedBox(height: 24),
-            ],
-          );
-        },
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 2,
-        onDestinationSelected: (index) {
-          if (index == 2) return;
-          switch (index) {
-            case 0:
-              _goTo(context, const TechnicianHomePage());
-              break;
-            case 1:
-              _goTo(context, const MessagesScreen());
-              break;
-          }
-        },
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'Chat'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+                      label: 'Availability',
+                      value: p.isAvailable ? 'Available' : 'Not available'),
+                  if (p.bio != null && p.bio!.isNotEmpty)
+                    _MultilineValue(label: 'About', value: p.bio!),
+                ]),
+                const SizedBox(height: 24),
+              ],
+            );
+          },
+        ),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: 3,
+          backgroundColor: Color.fromARGB(255, 250, 206, 149),
+          onDestinationSelected: (index) {
+            if (index == 3) return;
+            switch (index) {
+              case 0:
+                _goTo(context, const TechnicianHomePage());
+                break;
+              case 1:
+                _goTo(context, const TechnicianJobPage());
+                break;
+              case 2:
+                _goTo(context, const MessagesScreen());
+                break;
+            }
+          },
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+            NavigationDestination(icon: Icon(Icons.assignment), label: 'Job'),
+            NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'Chat'),
+            NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+          ],
+        ),
       ),
     );
   }
@@ -404,168 +413,171 @@ class _ProfileEditSheetState extends State<_ProfileEditSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final orangeScheme = ColorScheme.fromSeed(seedColor: const Color(0xFFF09013));
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Edit Profile',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 12),
-                Center(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: _avatarProvider(_avatarPath),
-                        child: _avatarPath == null
-                            ? const Icon(Icons.person, size: 36)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: -6,
-                        right: -6,
-                        child: Material(
-                          color: cs.primary,
-                          shape: const CircleBorder(),
-                          child: InkWell(
-                            customBorder: const CircleBorder(),
-                            onTap: () async {
-                              final path =
-                                  await _choosePhotoSourceAndPick(context);
-                              if (path == null) return;
-                              setState(() => _avatarPath = path);
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Icon(Icons.camera_alt,
-                                  size: 18, color: Colors.white),
+    return Theme(
+      data: Theme.of(context).copyWith(colorScheme: orangeScheme, useMaterial3: true),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Edit Profile',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: _avatarProvider(_avatarPath),
+                          child: _avatarPath == null
+                              ? const Icon(Icons.person, size: 36)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: -6,
+                          right: -6,
+                          child: Material(
+                            color: orangeScheme.primary,
+                            shape: const CircleBorder(),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () async {
+                                final path =
+                                    await _choosePhotoSourceAndPick(context);
+                                if (path == null) return;
+                                setState(() => _avatarPath = path);
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Icon(Icons.camera_alt,
+                                    size: 18, color: Colors.white),
+                              ),
                             ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _nameCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Full name',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (v) {
+                      final t = (v ?? '').trim();
+                      if (t.isEmpty) return 'Please enter a name';
+                      if (t.length < 3) {
+                        return 'Name must be at least 3 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _phoneCtrl,
+                          keyboardType: TextInputType.phone,
+                          decoration: const InputDecoration(
+                            labelText: 'Phone number',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (v) {
+                            final t = (v ?? '').trim();
+                            if (t.isEmpty) return 'Please enter a phone number';
+                            if (t.replaceAll(RegExp(r'[^0-9]'), '').length < 8) {
+                              return 'Enter a valid phone number';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _specialtyCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Specialty (optional)',
+                            border: OutlineInputBorder(),
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Full name',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (v) {
-                    final t = (v ?? '').trim();
-                    if (t.isEmpty) return 'Please enter a name';
-                    if (t.length < 3) {
-                      return 'Name must be at least 3 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _phoneCtrl,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          labelText: 'Phone number',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (v) {
-                          final t = (v ?? '').trim();
-                          if (t.isEmpty) return 'Please enter a phone number';
-                          if (t.replaceAll(RegExp(r'[^0-9]'), '').length < 8) {
-                            return 'Enter a valid phone number';
-                          }
-                          return null;
-                        },
-                      ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _addressCtrl,
+                    minLines: 2,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Address',
+                      hintText: 'Street, city, region',
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _specialtyCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Specialty (optional)',
-                          border: OutlineInputBorder(),
+                    validator: (v) => (v ?? '').trim().isEmpty
+                        ? 'Please enter an address'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _yearsCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Years of experience',
+                            border: OutlineInputBorder(),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: _addressCtrl,
-                  minLines: 2,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    hintText: 'Street, city, region',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (v) => (v ?? '').trim().isEmpty
-                      ? 'Please enter an address'
-                      : null,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _yearsCtrl,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Years of experience',
-                          border: OutlineInputBorder(),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('Available for jobs'),
+                          value: _isAvailable,
+                          onChanged: (v) => setState(() => _isAvailable = v),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('Available for jobs'),
-                        value: _isAvailable,
-                        onChanged: (v) => setState(() => _isAvailable = v),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text('Rating: ${_rating.toStringAsFixed(1)} / 5.0'),
-                Slider(
-                  value: _rating,
-                  min: 0,
-                  max: 5,
-                  divisions: 50,
-                  label: _rating.toStringAsFixed(1),
-                  onChanged: (v) => setState(() => _rating = v),
-                ),
-                _StarBar(rating: _rating),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _save,
-                    icon: const Icon(Icons.save),
-                    label: const Text('Save'),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Text('Rating: ${_rating.toStringAsFixed(1)} / 5.0'),
+                  Slider(
+                    value: _rating,
+                    min: 0,
+                    max: 5,
+                    divisions: 50,
+                    label: _rating.toStringAsFixed(1),
+                    onChanged: (v) => setState(() => _rating = v),
+                  ),
+                  _StarBar(rating: _rating),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _save,
+                      icon: const Icon(Icons.save),
+                      label: const Text('Save'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

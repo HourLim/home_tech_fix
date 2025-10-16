@@ -34,7 +34,7 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
             children: [
               const SizedBox(height: 50),
 
-              //  logo ng welcome
+              // Centered logo + welcome
               Column(
                 children: [
                   Image.asset('assets/logo.png', height: 90),

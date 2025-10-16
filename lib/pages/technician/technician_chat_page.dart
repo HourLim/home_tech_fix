@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'technician_home_page.dart';
 import 'technicain_profile_page.dart';
+import 'technician_job_page.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({Key? key}) : super(key: key);
@@ -133,24 +134,29 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
 
-      // ⬇️ Bottom Nav: switch pages
+      // Bottom Nav: switch pages
       bottomNavigationBar: NavigationBar(
-        selectedIndex: 1, // Chat is active here
+        selectedIndex: 2, // Chat is active here
+        backgroundColor: Color.fromARGB(255, 250, 206, 149),
         onDestinationSelected: (index) {
-          if (index == 1) return;
+          if (index == 2) return;
           switch (index) {
             case 0:
-              _goTo(context, const TechnicianHomePage());     // -> Home
+              _goTo(context, const TechnicianHomePage()); // -> Home
               break;
-            case 2:
-              _goTo(context, const TechnicianProfilePage());  // -> Profile
+            case 1:
+              _goTo(context, const TechnicianJobPage()); // -> Job page
+              break;
+            case 3:
+              _goTo(context, const TechnicianProfilePage()); // -> Profile
               break;
           }
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.assignment), label: 'Job'),
           NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'Chat'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

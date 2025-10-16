@@ -220,10 +220,12 @@ class _LoginPageState extends State<LoginPage> {
                                           if (_formKey.currentState?.validate() != true) return;
                                           setState(() => _isLoading = true);
 
+                                          // Simulate loading
                                           await Future.delayed(const Duration(milliseconds: 900));
 
                                           setState(() => _isLoading = false);
 
+                                          // ✅ Navigate to home page after successful login
                                           if (widget.isTechnician) {
                                             Navigator.pushReplacement(
                                               context,

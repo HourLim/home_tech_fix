@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart'; // Add this
 import 'package:hometechfix/pages/login_page.dart';
 import 'package:hometechfix/pages/mainscreen.dart';
 import 'package:hometechfix/pages/signup_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase before running app
   runApp(const MyApp());
 }
 
@@ -15,7 +18,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,7 +26,6 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // can change home dynamically using state
       home: const MainScreen(),
       routes: {
         '/login': (context) => const LoginPage(),
@@ -33,6 +34,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
 
 // import 'package:flutter/material.dart';
 // import 'package:hometechfix/pages/login_page.dart';

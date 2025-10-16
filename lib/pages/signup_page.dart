@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hometechfix/pages/main_navigation/main_navigation.dart';
 import 'package:hometechfix/pages/login_page.dart';
-import 'package:hometechfix/pages/technician/technician_home_page.dart';
-
+import 'package:hometechfix/pages/technician/technician_updatelicense_page.dart';
 
 class SignUpPage extends StatefulWidget {
   final bool isTechnician;
@@ -32,7 +33,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    // theme 
     final colorScheme = ColorScheme.fromSeed(seedColor: const Color(0xFF1E88E5));
     final theme = Theme.of(context).copyWith(
       colorScheme: colorScheme,
@@ -81,7 +81,6 @@ class _SignUpPageState extends State<SignUpPage> {
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // gradient header
             Container(
               height: 280,
               decoration: const BoxDecoration(
@@ -99,7 +98,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     const SizedBox(height: 28),
 
-                    // logo title subtitle 
+                    // Logo and Title
                     Column(
                       children: [
                         Container(
@@ -166,23 +165,29 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
 
+                            // Email Field
                             TextFormField(
                               controller: _usernameController,
+                              keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               decoration: const InputDecoration(
-                                labelText: "Username",
-                                hintText: "Enter your username",
-                                prefixIcon: Icon(Icons.person_outline),
+                                labelText: "Email",
+                                hintText: "Enter your email",
+                                prefixIcon: Icon(Icons.email_outlined),
                               ),
                               validator: (val) {
                                 if (val == null || val.trim().isEmpty) {
-                                  return "Please enter your username";
+                                  return "Please enter your email";
+                                }
+                                if (!val.contains('@')) {
+                                  return "Enter a valid email address";
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 14),
 
+                            // Password Field
                             TextFormField(
                               controller: _passwordController,
                               textInputAction: TextInputAction.next,
@@ -205,6 +210,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 14),
 
+                            // Confirm Password
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
@@ -226,6 +232,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                             const SizedBox(height: 8),
 
+                            // Sign Up Button
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
@@ -235,32 +242,64 @@ class _SignUpPageState extends State<SignUpPage> {
                                         if (_formKey.currentState?.validate() != true) return;
                                         setState(() => _isLoading = true);
 
-                                        await Future.delayed(const Duration(seconds: 1));
-
-                                        setState(() => _isLoading = false);
-
-                                        // navigate to Home
-                                        if (widget.isTechnician) {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => TechnicianHomePage(),
-                                            ),
+                                        try {
+                                          // Create user with Firebase Auth 
+                                          final credential = await FirebaseAuth.instance
+                                              .createUserWithEmailAndPassword(
+                                            email: _usernameController.text.trim(),
+                                            password: _passwordController.text.trim(),
                                           );
-                                        } else {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => const MainNavigationPage(),
-                                            ),
-                                          );
+
+                                          // Store user info in Firestore
+                                          await FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(credential.user!.uid)
+                                              .set({
+                                            'email': _usernameController.text.trim(),
+                                            'isTechnician': widget.isTechnician,
+                                            'createdAt': DateTime.now(),
+                                          });
+
+                                          // Navigate after signup
+                                          if (widget.isTechnician) {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const TechnicianCompleteProfilePage(),
+                                              ),
+                                            );
+                                          } else {
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const MainNavigationPage(),
+                                              ),
+                                            );
+                                          }
+                                        } on FirebaseAuthException catch (e) {
+                                          String message = 'Sign up failed';
+                                          if (e.code == 'email-already-in-use') {
+                                            message = 'That email is already in use.';
+                                          } else if (e.code == 'invalid-email') {
+                                            message = 'Invalid email address.';
+                                          } else if (e.code == 'weak-password') {
+                                            message = 'Password is too weak.';
+                                          }
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(content: Text(message)));
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Error: $e')));
+                                        } finally {
+                                          setState(() => _isLoading = false);
                                         }
                                       },
                                 child: _isLoading
                                     ? const SizedBox(
                                         height: 20,
                                         width: 20,
-                                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2.5, color: Colors.white),
                                       )
                                     : const Text("Sign Up"),
                               ),
@@ -268,6 +307,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                             const SizedBox(height: 14),
 
+                            // Already have account
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -277,7 +317,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                   onTap: () => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => LoginPage(isTechnician: widget.isTechnician),
+                                      builder: (_) =>
+                                          LoginPage(isTechnician: widget.isTechnician),
                                     ),
                                   ),
                                   child: Text(
