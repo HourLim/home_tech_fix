@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hometechfix/pages/chat_texting.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -44,14 +45,11 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  
-
   int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      
     });
   }
 
@@ -137,8 +135,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 }
 
-// The rest of the code remains unchanged (e.g., _StatusChip, RepairDetailsScreen, etc.)
-// I've truncated it here for brevity, but ensure to keep the full original content below this point.
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.status});
   final String status;
@@ -196,6 +192,7 @@ class RepairDetailsScreen extends StatelessWidget {
     final shop = (item["shop"] ?? "Unknown shop").toString();
     final status = (item["status"] ?? "-").toString();
     final isFinished = status.trim().toLowerCase() == "finished";
+    final isInProgress = status.trim().toLowerCase() == "in progress";
 
     final date = (item["date"] ?? "-").toString();
     final time = (item["time"] ?? "-").toString();
@@ -266,7 +263,7 @@ class RepairDetailsScreen extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Services performed (or placeholder if in progress)
+          // Services performed
           _SectionCard(
             title: "Services performed",
             child: services.isEmpty
@@ -323,7 +320,7 @@ class RepairDetailsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("1‑month warranty on this repair."),
+                const Text("1-month warranty on this repair."),
                 const SizedBox(height: 6),
                 if (isFinished && warrantyUntil != null)
                   Text(
@@ -341,36 +338,90 @@ class RepairDetailsScreen extends StatelessWidget {
         ],
       ),
 
-      // Bottom CTA: only for Finished (to avoid double-booking while in progress)
-      bottomNavigationBar: isFinished
-          ? SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: SizedBox(
+      // Bottom CTA
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: isInProgress
+              ? SizedBox(
                   height: 48,
                   child: ElevatedButton.icon(
-                    icon: const Icon(Icons.calendar_month),
+                    icon: const Icon(Icons.chat_bubble_outline),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade400,
+                      backgroundColor: Colors.blue.shade400,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     label: const Text(
-                      "Rebook this shop",
+                      "Chat with technician",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    onPressed: () => _handleRebook(
-                      context,
-                      item,
-                      onRebooked: onRebooked,
-                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ChatScreen(
+                            contactName: technician.isEmpty ? shop : technician,
+                            avatarAsset: 'assets/profile.jpg', 
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-              ),
-            )
-          : null,
+                )
+              : isFinished
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 48,
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.star_outline),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber.shade400,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            label: const Text(
+                              "Rate this service",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () => _showRatingDialog(context, shop),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 48,
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.calendar_month),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange.shade400,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            label: const Text(
+                              "Rebook this shop",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () => _handleRebook(
+                              context,
+                              item,
+                              onRebooked: onRebooked,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : null,
+        ),
+      ),
     );
   }
 }
@@ -396,18 +447,29 @@ class BookingScreen extends StatelessWidget {
         title: const Text("Booking"),
       ),
       body: Center(
-  child: Padding(
-    padding: const EdgeInsets.all(24),
-    child: Text(
-      "Your re-booking is complete",
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.check_circle_outline,
+                size: 80,
+                color: Colors.green.shade400,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Your re-booking is complete",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ),
-  ),
-),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -419,6 +481,10 @@ class BookingScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.description),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade400,
+                    foregroundColor: Colors.white,
+                  ),
                   label: const Text("View details"),
                   onPressed: () {
                     Navigator.of(context).push(
@@ -575,8 +641,7 @@ Future<void> _handleRebook(
         "Scheduled with ${item["shop"] ?? "the shop"} for ${_prettyDate(scheduled)} at ${_prettyTime(pickedTime)}.",
   );
 
- // go to the booking screen to shhow the new booking 
-
+  // go to the booking screen to show the new booking
   Navigator.of(context).pushReplacement(
     MaterialPageRoute(
       builder: (_) => BookingScreen(booking: newBooking),
@@ -624,3 +689,128 @@ String _prettyTime(TimeOfDay t) {
 }
 
 String _pad(int n) => n.toString().padLeft(2, '0');
+
+Future<void> _showRatingDialog(BuildContext context, String shopName) async {
+  int selectedRating = 0;
+  final commentCtrl = TextEditingController();
+
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        title: const Text(
+          'Rate Service',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'How was your experience with $shopName?',
+                style: const TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    final starValue = index + 1;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => selectedRating = starValue);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Icon(
+                          starValue <= selectedRating
+                              ? Icons.star
+                              : Icons.star_border,
+                          size: 40,
+                          color: Colors.amber.shade600,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              if (selectedRating > 0) ...[
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    _getRatingText(selectedRating),
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
+              TextField(
+                controller: commentCtrl,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Add a comment (optional)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.all(12),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: selectedRating > 0
+                ? () => Navigator.of(ctx).pop(true)
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber.shade400,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: Colors.grey.shade300,
+            ),
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  if (result == true && selectedRating > 0) {
+    if (!context.mounted) return;
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Thank you for rating! You gave $selectedRating star${selectedRating > 1 ? 's' : ''}'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  commentCtrl.dispose();
+}
+
+String _getRatingText(int rating) {
+  switch (rating) {
+    case 1:
+      return 'Poor';
+    case 2:
+      return 'Fair';
+    case 3:
+      return 'Good';
+    case 4:
+      return 'Very Good';
+    case 5:
+      return 'Excellent';
+    default:
+      return '';
+  }
+}

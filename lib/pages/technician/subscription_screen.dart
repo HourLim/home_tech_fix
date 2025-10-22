@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() => runApp(const MaterialApp(home: SubscriptionScreen()));
+import 'package:hometechfix/pages/technician/payment_screen.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({Key? key}) : super(key: key);
@@ -9,8 +8,25 @@ class SubscriptionScreen extends StatefulWidget {
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
-class _SubscriptionScreenState extends State<SubscriptionScreen> {
-  String _selected = 'yearly'; // default
+class _SubscriptionScreenState extends State<SubscriptionScreen>
+    with SingleTickerProviderStateMixin {
+  String _selected = 'yearly'; 
+  final double topSpacing = 80;
+
+  void _continue() {
+    final plan = _selected == 'yearly' ? 'Yearly' : 'Monthly';
+    final price = _selected == 'yearly' ? 70.0 : 8.0;
+    
+    // Navigate to Payment Screen
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PaymentScreen(
+          planName: plan,
+          amount: price,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,94 +40,43 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black87,
         title: const Text('Choose your plan'),
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _headerCard(),
-            ),
-            const SizedBox(height: 12),
-
-            // Plan cards
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _planCard(
-                      title: 'Monthly\nTechnician',
-                      subTitle: 'Pricing Structure',
-                      price: '\$8',
-                      cadence: 'per month',
-                      description:
-                          'Unlimited listings each month. Great for active shops that want steady visibility.',
-                      selected: _selected == 'monthly',
-                      accent: Colors.cyan,
-                      cornerBadge: null,
-                      onTap: () => setState(() => _selected = 'monthly'),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: _planCard(
-                      title: 'Yearly\nTechnician',
-                      subTitle: 'Pricing Structure',
-                      price: '\$70',
-                      cadence: 'per year',
-                      description:
-                          'Unlimited listings for 12 months + priority placement. Best for long-term exposure.',
-                      selected: _selected == 'yearly',
-                      accent: Colors.indigo,
-                      cornerBadge: 'Best value',
-                      onTap: () => setState(() => _selected = 'yearly'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: const [
-                  Icon(Icons.verified, size: 18, color: Colors.green),
-                  SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Cancel anytime • Secure payments • Instant activation',
-                      style: TextStyle(fontSize: 12.5, color: Colors.black54),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-
-            // CTA
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      final plan = _selected == 'yearly' ? 'Yearly' : 'Monthly';
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          behavior: SnackBarBehavior.floating,
-                          content: Text('Selected: $plan Technician Plan'),
-                        ),
-                      );
-                      // TODO: push to checkout
-                    },
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(top: topSpacing, bottom: 30),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _planCard(
+                  title: 'Monthly Technician',
+                  price: '\$8',
+                  cadence: 'per month',
+                  description: 'Unlimited listings each month.',
+                  selected: _selected == 'monthly',
+                  accent: Colors.cyan,
+                  onTap: () => setState(() => _selected = 'monthly'),
+                ),
+                const SizedBox(height: 40),
+                _planCard(
+                  title: 'Yearly Technician',
+                  price: '\$70',
+                  cadence: 'per year',
+                  description: 'Unlimited listings for 12 months.',
+                  selected: _selected == 'yearly',
+                  accent: Colors.amber,
+                  cornerBadge: 'Best value',
+                  onTap: () => setState(() => _selected = 'yearly'),
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: 320,
+                  child: ElevatedButton(
+                    onPressed: _continue,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor:
-                          _selected == 'yearly' ? Colors.indigo : Colors.cyan,
+                      backgroundColor: Colors.amber,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -128,50 +93,24 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'By continuing you agree to our Terms & Privacy.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: Colors.black45),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ------- Helpers (still inside the same StatefulWidget) -------
-
-  Widget _headerCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE3E8F1)),
-      ),
-      child: Row(
-        children: const [
-          Icon(Icons.workspace_premium, color: Colors.indigo),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Pick the plan that fits your shop. Switch or cancel anytime.',
-              style: TextStyle(fontSize: 13.5, color: Colors.black87),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'By continuing you agree to our Terms & Privacy.',
+                  textAlign: TextAlign.center,
+                  style:
+                      theme.textTheme.bodySmall?.copyWith(color: Colors.black45),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _planCard({
     required String title,
-    required String subTitle,
     required String price,
     required String cadence,
     required String description,
@@ -185,155 +124,129 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
+      child: AnimatedScale(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: base,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: accent.withOpacity(0.22),
-                    blurRadius: 18,
-                    offset: const Offset(0, 10),
+        scale: selected ? 1.03 : 1.0,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          width: 320,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: base,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: accent.withOpacity(0.25),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ]
+                : [
+                    const BoxShadow(
+                      color: Color(0x11000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+            border: Border.all(
+              color: selected ? accent : const Color(0xFFE3E8F1),
+              width: selected ? 2 : 1,
+            ),
+          ),
+          child: Stack(
+            children: [
+              if (cornerBadge != null)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: accent,
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(18),
+                        bottomLeft: Radius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      cornerBadge,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
-                ]
-              : [
-                  const BoxShadow(
-                    color: Color(0x11000000),
-                    blurRadius: 10,
-                    offset: Offset(0, 6),
+                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: accent.withOpacity(.12),
+                        child: Icon(Icons.build, color: accent),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 2,
+                          style: TextStyle(
+                            height: 1.1,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: accent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        price,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: Text(
+                          cadence,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (cadence.contains('year')) _saveChip('Save 27%'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 13.2,
+                      height: 1.35,
+                      color: Colors.black87,
+                    ),
                   ),
                 ],
-          border: Border.all(
-            color: selected ? accent : const Color(0xFFE3E8F1),
-            width: selected ? 2 : 1,
-          ),
-          gradient: selected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [base, base.withOpacity(0.96)],
-                )
-              : null,
-        ),
-        child: Stack(
-          children: [
-            if (cornerBadge != null)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(18),
-                      bottomLeft: Radius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    cornerBadge,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ),
               ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: accent.withOpacity(.12),
-                      child: Icon(Icons.build, color: accent),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        title,
-                        maxLines: 2,
-                        style: TextStyle(
-                          height: 1.1,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          // FIX: use accent directly (no shade700)
-                          color: accent,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  subTitle,
-                  style: const TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(
-                        cadence,
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    if (cadence.contains('year')) _saveChip('Save 27%'),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 13.2,
-                    height: 1.35,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.check_circle, size: 18, color: accent),
-                    const SizedBox(width: 6),
-                    const Expanded(
-                      child: Text(
-                        'Unlimited listings • Priority support',
-                        style:
-                            TextStyle(fontSize: 12.2, color: Colors.black54),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

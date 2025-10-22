@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hometechfix/pages/technician/technician_home_page.dart';
+import 'package:hometechfix/pages/technician/subscription_screen.dart';
 
 class TechnicianCompleteProfilePage extends StatefulWidget {
   const TechnicianCompleteProfilePage({super.key});
@@ -63,29 +63,28 @@ class _TechnicianCompleteProfilePageState extends State<TechnicianCompleteProfil
         throw Exception('No user logged in');
       }
 
-      // Update Firestore with profile completion
+      // Update Firestore profile
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .update({
-        'profileCompleted': true,
         'address': _address.text.trim(),
         'city': _city.text.trim(),
         'country': _country.text.trim(),
-        'profileCompletedAt': FieldValue.serverTimestamp(),
+        'licenseUploaded': true,
+        'licenseUploadedAt': FieldValue.serverTimestamp(),
       });
 
-      debugPrint('--- Technician Complete Profile ---');
+      debugPrint('--- Technician License & Address Saved ---');
       debugPrint('License bytes: ${_licenseBytes?.length}');
       debugPrint('Address: ${_address.text}, ${_city.text}, ${_country.text}');
-      debugPrint('Profile marked as completed in Firestore');
       debugPrint('------------------------------------');
 
       if (!mounted) return;
       
-      // Navigate to technician home and remove all previous routes
+      // Navigate to subscription screen
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const TechnicianHomePage()),
+        MaterialPageRoute(builder: (_) => const SubscriptionScreen()),
         (route) => false,
       );
     } catch (e) {
@@ -109,7 +108,7 @@ class _TechnicianCompleteProfilePageState extends State<TechnicianCompleteProfil
     return Scaffold(
       appBar: AppBar(
         title: const Text('Complete Technician Profile'),
-        automaticallyImplyLeading: false, // Prevent going back
+        automaticallyImplyLeading: false, // prevent back button
       ),
       body: SafeArea(
         child: ListView(
