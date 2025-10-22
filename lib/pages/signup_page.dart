@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hometechfix/pages/main_navigation/main_navigation.dart';
 import 'package:hometechfix/pages/login_page.dart';
 import 'package:hometechfix/pages/technician/technician_updatelicense_page.dart';
 
@@ -29,6 +28,79 @@ class _SignUpPageState extends State<SignUpPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignUp() async {
+    if (_formKey.currentState?.validate() != true) return;
+    
+    setState(() => _isLoading = true);
+
+    try {
+      // Create user with Firebase Auth 
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _usernameController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // Store user info in Firestore with profileCompleted status
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(credential.user!.uid)
+          .set({
+        'email': _usernameController.text.trim(),
+        'isTechnician': widget.isTechnician,
+        'profileCompleted': !widget.isTechnician, // false for technicians, true for users
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+
+      // For technicians, go to profile completion
+      if (widget.isTechnician) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const TechnicianCompleteProfilePage(),
+          ),
+        );
+      } else {
+        // For regular users, pop all routes and let AuthWrapper handle navigation
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      
+      String message = 'Sign up failed';
+      if (e.code == 'email-already-in-use') {
+        message = 'That email is already in use.';
+      } else if (e.code == 'invalid-email') {
+        message = 'Invalid email address.';
+      } else if (e.code == 'weak-password') {
+        message = 'Password is too weak.';
+      } else if (e.code == 'operation-not-allowed') {
+        message = 'Email/password accounts are not enabled.';
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -230,70 +302,13 @@ class _SignUpPageState extends State<SignUpPage> {
                               },
                             ),
 
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 18),
 
                             // Sign Up Button
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: _isLoading
-                                    ? null
-                                    : () async {
-                                        if (_formKey.currentState?.validate() != true) return;
-                                        setState(() => _isLoading = true);
-
-                                        try {
-                                          // Create user with Firebase Auth 
-                                          final credential = await FirebaseAuth.instance
-                                              .createUserWithEmailAndPassword(
-                                            email: _usernameController.text.trim(),
-                                            password: _passwordController.text.trim(),
-                                          );
-
-                                          // Store user info in Firestore
-                                          await FirebaseFirestore.instance
-                                              .collection('users')
-                                              .doc(credential.user!.uid)
-                                              .set({
-                                            'email': _usernameController.text.trim(),
-                                            'isTechnician': widget.isTechnician,
-                                            'createdAt': DateTime.now(),
-                                          });
-
-                                          // Navigate after signup
-                                          if (widget.isTechnician) {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => const TechnicianCompleteProfilePage(),
-                                              ),
-                                            );
-                                          } else {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => const MainNavigationPage(),
-                                              ),
-                                            );
-                                          }
-                                        } on FirebaseAuthException catch (e) {
-                                          String message = 'Sign up failed';
-                                          if (e.code == 'email-already-in-use') {
-                                            message = 'That email is already in use.';
-                                          } else if (e.code == 'invalid-email') {
-                                            message = 'Invalid email address.';
-                                          } else if (e.code == 'weak-password') {
-                                            message = 'Password is too weak.';
-                                          }
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(content: Text(message)));
-                                        } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('Error: $e')));
-                                        } finally {
-                                          setState(() => _isLoading = false);
-                                        }
-                                      },
+                                onPressed: _isLoading ? null : _handleSignUp,
                                 child: _isLoading
                                     ? const SizedBox(
                                         height: 20,

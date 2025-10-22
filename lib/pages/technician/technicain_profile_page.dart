@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hometechfix/pages/choose_role.dart';
 import 'technician_home_page.dart';
 import 'technician_chat_page.dart';
 import 'technician_job_page.dart';
@@ -146,6 +147,53 @@ class _TechnicianProfilePageState extends State<TechnicianProfilePage> {
         const SnackBar(content: Text('Profile updated')),
       );
       setState(() {});
+    }
+  }
+
+  Future<void> _handleLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        // Sign out from Firebase
+        await FirebaseAuth.instance.signOut();
+        
+        if (!mounted) return;
+        
+        
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const RoleSelectScreen(),
+          ),
+          (route) => false,
+        );
+        
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error logging out: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -302,6 +350,22 @@ class _TechnicianProfilePageState extends State<TechnicianProfilePage> {
                   if (p.bio != null && p.bio!.isNotEmpty)
                     _MultilineValue(label: 'About', value: p.bio!),
                 ]),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _handleLogout(context),
+                    icon: const Icon(Icons.logout, color: Colors.red),
+                    label: const Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: Colors.red),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
               ],
             );

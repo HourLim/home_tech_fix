@@ -1,6 +1,3 @@
-import 'package:hometechfix/pages/login_page.dart';
-import 'package:hometechfix/pages/technician/technician_home_page.dart';
-import 'package:hometechfix/pages/technician/technician_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hometechfix/pages/signup_page.dart';
 
@@ -98,33 +95,31 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
 
               const Spacer(),
 
-              // Continue
+              // Continue Button
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                 child: SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: FilledButton(
                     onPressed: _selected == null
                         ? null
-                        : () async {
-                            if (_selected == AppRole.user) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SignUpPage()),
-                              );
-                            } else {
-                              // Technician: go to signup, pass isTechnician flag
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SignUpPage(isTechnician: true)),
-                              );
-                              // Navigation after signup/login handled in SignUpPage/LoginPage
-                            }
+                        : () {
+                            // Navigate to SignUpPage with appropriate role
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SignUpPage(
+                                  isTechnician: _selected == AppRole.technician,
+                                ),
+                              ),
+                            );
                           },
                     style: FilledButton.styleFrom(
                       backgroundColor: mainBlue,
+                      disabledBackgroundColor: Colors.grey.shade300,
                       foregroundColor: Colors.white,
+                      disabledForegroundColor: Colors.grey.shade500,
                       textStyle: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -135,6 +130,43 @@ class _RoleSelectScreenState extends State<RoleSelectScreen> {
                     ),
                     child: const Text("Continue"),
                   ),
+                ),
+              ),
+
+              // Already have account link
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      style: TextStyle(color: Colors.grey.shade700, fontSize: 14),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // If role is selected, pass it to login page
+                        if (_selected != null) {
+                          Navigator.pushNamed(
+                            context,
+                            '/login',
+                            arguments: {'isTechnician': _selected == AppRole.technician},
+                          );
+                        } else {
+                          // If no role selected, just go to login (will default to user)
+                          Navigator.pushNamed(context, '/login');
+                        }
+                      },
+                      child: const Text(
+                        "Log In",
+                        style: TextStyle(
+                          color: mainBlue,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -201,12 +233,14 @@ class _RoleCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        color: Colors.black87,
-                      )),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,

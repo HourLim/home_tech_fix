@@ -29,7 +29,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     },
   ];
 
-  // 🔁 helper to switch pages
+  
   void _goTo(BuildContext context, Widget page) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => page),
@@ -74,7 +74,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ),
             ),
 
-            // Search
+           // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
@@ -134,21 +134,20 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
 
-      // Bottom Nav: switch pages
       bottomNavigationBar: NavigationBar(
-        selectedIndex: 2, // Chat is active here
+        selectedIndex: 2, 
         backgroundColor: Color.fromARGB(255, 250, 206, 149),
         onDestinationSelected: (index) {
           if (index == 2) return;
           switch (index) {
             case 0:
-              _goTo(context, const TechnicianHomePage()); // -> Home
+              _goTo(context, const TechnicianHomePage()); // tov Home
               break;
             case 1:
-              _goTo(context, const TechnicianJobPage()); // -> Job page
+              _goTo(context, const TechnicianJobPage()); // tov Job page
               break;
             case 3:
-              _goTo(context, const TechnicianProfilePage()); // -> Profile
+              _goTo(context, const TechnicianProfilePage()); // tov Profile
               break;
           }
         },

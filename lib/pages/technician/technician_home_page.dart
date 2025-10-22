@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'technician_chat_page.dart';
 import 'technicain_profile_page.dart';
 import 'technician_job_page.dart';
 
-/// ===== Palette tuned to your screenshot =====
-/// Backgrounds
-const kBgPeach        = Color(0xFFFFF3EF); // very soft page background
-const kCardPeach      = Color(0xFFFCEEE3); // card background
 
-/// Oranges (CTA / highlights / navbar)
-const kOrangeSoft     = Color(0xFFF0BB86); // navbar / soft CTA
-const kOrangeSoftDark = Color(0xFFE3A667); // headings / prices / strong accent
-const kOrangeInk      = Color(0xFFD28540); // icons on peach surfaces
+const kBgPeach        = Color(0xFFFFF3EF); 
+const kCardPeach      = Color(0xFFFCEEE3); 
 
-/// Text
-const kInk            = Color(0xFF2B2623); // main text
-const kInkMuted       = Color(0xFF6B615B); // secondary text
 
-/// Success chip like “Available”
+const kOrangeSoft     = Color(0xFFF0BB86); 
+const kOrangeSoftDark = Color(0xFFE3A667); 
+const kOrangeInk      = Color(0xFFD28540); 
+
+
+const kInk            = Color(0xFF2B2623); 
+const kInkMuted       = Color(0xFF6B615B); 
+
+
 const kMintChip       = Color(0xFFE6F5EA);
 const kMintInk        = Color(0xFF2D6B3E);
 
-/// Stars
+
 const kStar           = Color(0xFFFFC857);
 
 class Technician {
@@ -204,7 +204,7 @@ class _TechnicianHomePageState extends State<TechnicianHomePage> {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: kOrangeSoft, // Create Service uses its own override below
+          backgroundColor: kOrangeSoft, 
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
@@ -249,7 +249,7 @@ class _TechnicianHomePageState extends State<TechnicianHomePage> {
               ),
               const SizedBox(height: 24),
 
-              // ---- Manage Services ----
+              // Manage Services
               Card(
                 elevation: 0,
                 child: Padding(
@@ -269,7 +269,7 @@ class _TechnicianHomePageState extends State<TechnicianHomePage> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Create Service → soft orange (CTA)
+                      
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -421,7 +421,7 @@ Widget _swipeBg({required bool alignRight, required BuildContext context}) {
   );
 }
 
-/// ---------- Reusable UI ----------
+// Profile Header Card
 class _ProfileHeaderCard extends StatefulWidget {
   final Technician technician;
   const _ProfileHeaderCard({required this.technician});
@@ -448,7 +448,7 @@ class _ProfileHeaderCardState extends State<_ProfileHeaderCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: const [
-                    // Name filled below so spacing consistent
+                   
                   ]),
                   Row(
                     children: [
@@ -481,7 +481,7 @@ class _ProfileHeaderCardState extends State<_ProfileHeaderCard> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // availability chip to match screenshot vibe
+                  
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(

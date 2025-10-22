@@ -310,7 +310,7 @@ class _ServiceCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.ac_unit, size: 32), // should change to image 
+          const Icon(Icons.ac_unit, size: 32), 
           const SizedBox(width: 12),
           Expanded(
             child: Column(

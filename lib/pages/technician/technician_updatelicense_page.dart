@@ -2,6 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hometechfix/pages/technician/technician_home_page.dart';
 
 class TechnicianCompleteProfilePage extends StatefulWidget {
@@ -54,27 +56,61 @@ class _TechnicianCompleteProfilePageState extends State<TechnicianCompleteProfil
 
     setState(() => _saving = true);
 
-    // FRONTEND ONLY: simulate "saving"
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-    debugPrint('--- Technician Complete Profile (frontend only) ---');
-    debugPrint('License bytes: ${_licenseBytes?.length}');
-  debugPrint('Address: ${_address.text}, ${_city.text}, ${_country.text}');
-    debugPrint('----------------------------------------------------');
+    try {
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('No user logged in');
+      }
 
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => TechnicianHomePage()),
-      (route) => false,
-    );
+      // Update Firestore with profile completion
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'profileCompleted': true,
+        'address': _address.text.trim(),
+        'city': _city.text.trim(),
+        'country': _country.text.trim(),
+        'profileCompletedAt': FieldValue.serverTimestamp(),
+      });
+
+      debugPrint('--- Technician Complete Profile ---');
+      debugPrint('License bytes: ${_licenseBytes?.length}');
+      debugPrint('Address: ${_address.text}, ${_city.text}, ${_country.text}');
+      debugPrint('Profile marked as completed in Firestore');
+      debugPrint('------------------------------------');
+
+      if (!mounted) return;
+      
+      // Navigate to technician home and remove all previous routes
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const TechnicianHomePage()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving profile: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      
+      setState(() => _saving = false);
+    }
   }
 
   String? _req(String? v) => (v == null || v.trim().isEmpty) ? 'Required' : null;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Complete Technician Profile')),
+      appBar: AppBar(
+        title: const Text('Complete Technician Profile'),
+        automaticallyImplyLeading: false, // Prevent going back
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
@@ -134,7 +170,7 @@ class _TechnicianCompleteProfilePageState extends State<TechnicianCompleteProfil
                                 const Padding(
                                   padding: EdgeInsets.only(top: 8.0),
                                   child: Text(
-                                    'On web, “Use camera” may open the file picker depending on browser support.',
+                                    'On web, "Use camera" may open the file picker depending on browser support.',
                                     style: TextStyle(color: Colors.black54, fontSize: 12),
                                   ),
                                 ),
@@ -180,7 +216,7 @@ class _TechnicianCompleteProfilePageState extends State<TechnicianCompleteProfil
               child: FilledButton.icon(
                 onPressed: _saving ? null : _save,
                 icon: _saving
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : const Icon(Icons.check_circle_outline),
                 label: const Text('Save & Continue'),
               ),

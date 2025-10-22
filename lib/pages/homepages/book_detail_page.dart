@@ -1,5 +1,8 @@
 import 'package:hometechfix/pages/history_page.dart';
 import 'package:flutter/material.dart';
+import 'package:hometechfix/pages/main_navigation/main_navigation.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class BookingDetailPage extends StatefulWidget {
@@ -25,7 +28,7 @@ class BookingDetailPage extends StatefulWidget {
 class _BookingDetailPageState extends State<BookingDetailPage> {
   final _otherLocationCtrl = TextEditingController();
 
-  // Location — per request: only Home and Other
+  // Location options
   final List<String> _locations = ['Home', 'Other'];
   String? _selectedLocation;
 
@@ -33,10 +36,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
 
-  // Quantity
   int _qty = 1;
-
-  // VAT removed
 
   @override
   void initState() {
@@ -67,7 +67,6 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
     if (picked != null) setState(() => _selectedTime = picked);
   }
 
-  // Build a booking map that matches your sample in history_page.dart
   Map<String, dynamic> _buildBookingPayload() {
     final ddMMyyyy = DateFormat('dd/MM/yyyy').format(_selectedDate);
     final time12h = _formatTime(_selectedTime);
@@ -77,7 +76,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
 
     return {
       "shop": widget.vendorName,
-      "date": ddMMyyyy,                // e.g., 26/08/2025
+      "date": ddMMyyyy,                // e.g., 25/12/2024
       "time": time12h,                 // e.g., 3:20 PM
       "status": "In progress",         // default for new bookings
       "device": widget.serviceTitle,   // map service title to 'device' field in sample
@@ -86,7 +85,6 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
       "services": [
         {"name": widget.serviceTitle, "price": widget.unitPrice},
       ],
-      // Totals (VAT removed)
       "subtotal": _subTotal,
       "total": _total,
       "qty": _qty,
@@ -97,14 +95,19 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
   void _confirmBooking() {
     final booking = _buildBookingPayload();
 
-    // Navigate to HistoryScreen and pass the new booking.
-    // In your HistoryScreen, read:
-    // final args = ModalRoute.of(context)?.settings.arguments as Map?;
-    // if (args?['newBooking'] != null) { /* insert to top */ }
+    final exists = HistoryScreen.history.any((e) =>
+        e['shop'] == booking['shop'] &&
+        e['date'] == booking['date'] &&
+        e['time'] == booking['time'] &&
+        e['device'] == booking['device']);
+
+    if (!exists) {
+      HistoryScreen.history.insert(0, booking);
+    }
+
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => const HistoryScreen(),
-        settings: RouteSettings(arguments: {"newBooking": booking}),
+        builder: (_) => const MainNavigationPage(initialIndex: 1),
       ),
     );
   }
@@ -189,7 +192,6 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
           _vendorCard(theme, currency),
           const SizedBox(height: 16),
 
-          // Summary
           _summaryRow('Total', currency.format(_total), emphasize: true),
           const SizedBox(height: 100),
         ],
@@ -238,7 +240,7 @@ class _BookingDetailPageState extends State<BookingDetailPage> {
     );
   }
 
-  // UI helpers
+  // decoration helper
   InputDecoration _decor(String hint) => InputDecoration(
         hintText: hint,
         contentPadding:

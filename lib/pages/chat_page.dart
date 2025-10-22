@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'chat_texting.dart'; // <- import the texting page below
+import 'chat_texting.dart'; 
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({Key? key}) : super(key: key);
@@ -11,7 +11,7 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   int _selectedIndex = 2;
 
-  // Example chat data (local images in assets/)
+  
   final List<Map<String, dynamic>> messages = [
     {
       "name": "Layy Heng",
@@ -41,7 +41,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
-    // TODO: Navigate to other pages when needed
+    
   }
 
   @override
@@ -51,7 +51,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top Bar
+           
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
