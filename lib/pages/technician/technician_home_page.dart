@@ -82,7 +82,7 @@ class TechnicianHomePage extends StatefulWidget {
 
 class _TechnicianHomePageState extends State<TechnicianHomePage> {
   static const technician = Technician(
-    name: 'Sok Dara',
+    name: 'Lam hour',
     specialty: 'AC & Electrical Technician',
     rating: 4.8,
     jobsCompleted: 410,

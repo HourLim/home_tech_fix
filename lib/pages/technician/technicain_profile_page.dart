@@ -70,6 +70,8 @@ class TechnicianProfile {
     this.avatarPath,
   });
 
+  get jobsCompleted => null;
+
   TechnicianProfile copyWith({
     String? name,
     String? phoneNumber,
@@ -102,7 +104,7 @@ class TechnicianProfileStore {
   final ValueNotifier<TechnicianProfile> profile =
       ValueNotifier<TechnicianProfile>(
     const TechnicianProfile(
-      name: 'Sok Dara',
+      name: 'Lam hour',
       phoneNumber: '+855 12 345 678',
       rating: 4.8,
       address: 'Phnom Penh, Cambodia',
